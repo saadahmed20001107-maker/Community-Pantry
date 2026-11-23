@@ -6,6 +6,13 @@
  */
 public class Validator {
 
+    // Limits from the brief, kept in one place. Main builds its prompts from these too.
+    public static final int MAX_NAME_LENGTH = 40;
+    public static final int MIN_STOCK = 0;
+    public static final int MAX_STOCK = 1000;
+    public static final int MIN_QUANTITY = 1;
+    public static final int MAX_QUANTITY = 1000;
+
     // Trim and uppercase, as the brief asks. null becomes "".
     public static String cleanId(String raw) {
         if (raw == null) {
@@ -37,9 +44,9 @@ public class Validator {
     // Name: 1 to 40 characters after trimming
     public static String checkName(String raw) {
         String name = (raw == null) ? "" : raw.trim();
-        if (name.length() < 1 || name.length() > 40) {
+        if (name.length() < 1 || name.length() > MAX_NAME_LENGTH) {
             throw new IllegalArgumentException(
-                "Item name must be 1 to 40 characters.");
+                "Item name must be 1 to " + MAX_NAME_LENGTH + " characters.");
         }
         return name;
     }
@@ -51,24 +58,24 @@ public class Validator {
             return Integer.parseInt(text.trim());
         } catch (NumberFormatException | NullPointerException e) {
             throw new IllegalArgumentException(
-                label + " must be a whole number.");
+                label + " must be a whole number in the allowed range.");
         }
     }
 
     // Initial stock: 0 to 1000
     public static int checkStock(int stock) {
-        if (stock < 0 || stock > 1000) {
+        if (stock < MIN_STOCK || stock > MAX_STOCK) {
             throw new IllegalArgumentException(
-                "Initial stock must be a whole number from 0 to 1000.");
+                "Initial stock must be a whole number from " + MIN_STOCK + " to " + MAX_STOCK + ".");
         }
         return stock;
     }
 
     // Request quantity: 1 to 1000
     public static int checkQuantity(int quantity) {
-        if (quantity < 1 || quantity > 1000) {
+        if (quantity < MIN_QUANTITY || quantity > MAX_QUANTITY) {
             throw new IllegalArgumentException(
-                "Quantity must be a whole number from 1 to 1000.");
+                "Quantity must be a whole number from " + MIN_QUANTITY + " to " + MAX_QUANTITY + ".");
         }
         return quantity;
     }
