@@ -77,8 +77,8 @@ public class Main {
 
     private static void registerItem() {
         String id = askRequired("Item ID (e.g. R001): ");
-        String name = askRequired("Item name (1-40 characters): ");
-        int stock = Validator.parseWholeNumber(askRequired("Initial stock (0-1000): "), "Initial stock");
+        String name = askRequired("Item name (1-" + Validator.MAX_NAME_LENGTH + " characters): ");
+        int stock = Validator.parseWholeNumber(askRequired("Initial stock (" + Validator.MIN_STOCK + "-" + Validator.MAX_STOCK + "): "), "Initial stock");
         Item item = itemManager.registerItem(id, name, stock);
         System.out.println("Item registered: " + item);
     }
@@ -96,7 +96,7 @@ public class Main {
     private static void registerRequest() {
         String reqId = askRequired("Request ID (e.g. Q001): ");
         String itemId = askRequired("Item ID: ");
-        int qty = Validator.parseWholeNumber(askRequired("Quantity (1-1000): "), "Quantity");
+        int qty = Validator.parseWholeNumber(askRequired("Quantity (" + Validator.MIN_QUANTITY + "-" + Validator.MAX_QUANTITY + "): "), "Quantity");
         Request r = requestManager.registerRequest(reqId, itemId, qty);
         System.out.println("Request registered: " + r);
     }
@@ -130,6 +130,25 @@ public class Main {
 
     // The dataset from the brief, so the demo and regression tests start the same way each time.
     private static void loadSampleData() {
+        // Check every sample ID first, so a clash changes nothing (no half-loaded data).
+        String[] itemIds = {"R001", "O001"};
+        String[] requestIds = {"Q001", "Q002", "Q003"};
+        for (String id : itemIds) {
+            if (itemManager.findItem(id) != null) {
+                System.out.println("Sample data could not be loaded: item " + id
+                        + " already exists. Nothing was changed.");
+                return;
+            }
+        }
+        for (Request used : storage.getHistory()) {
+            for (String id : requestIds) {
+                if (used.getId().equals(id)) {
+                    System.out.println("Sample data could not be loaded: request " + id
+                            + " already exists. Nothing was changed.");
+                    return;
+                }
+            }
+        }
         try {
             itemManager.registerItem("R001", "Rice packs", 10);
             itemManager.registerItem("O001", "Oil bottles", 4);
